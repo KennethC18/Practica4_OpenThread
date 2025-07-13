@@ -53,7 +53,7 @@ void handle_nombre_request(void *aContext, otMessage *aMessage, const otMessageI
 {
     otMessage *response;
 
-    if (otCoapMessageGetCode(aMessage) == OT_COAP_CODE_GET)  
+    if (otCoapMessageGetCode(aMessage) == OT_COAP_CODE_GET)
     {
         response = otCoapNewMessage(instance_g, NULL);
         otCliOutputFormat("GET\r\n");
@@ -70,6 +70,23 @@ void handle_nombre_request(void *aContext, otMessage *aMessage, const otMessageI
 
             otCoapSendResponse(instance_g, response, aMessageInfo);
         }
+    }
+    else if (otCoapMessageGetCode(aMessage) == OT_COAP_CODE_PUT)
+    {
+        char payload[20];
+        int length = otMessageRead(aMessage, otMessageGetOffset(aMessage), payload, sizeof(payload) - 1);
+        payload[length] = '\0';
+
+        response = otCoapNewMessage(instance_g, NULL);
+        otCliOutputFormat("PUT\r\n");
+
+        otCliOutputFormat("payload: %s\r\n", payload);
+
+        strcpy(&str_nombre[0],&payload[0]);
+
+        otMessage *response = otCoapNewMessage(instance_g, NULL);
+        otCoapMessageInitResponse(response, aMessage, OT_COAP_TYPE_ACKNOWLEDGMENT, OT_COAP_CODE_CHANGED);
+        otCoapSendResponse(instance_g, response, aMessageInfo);
     }
 }
 
