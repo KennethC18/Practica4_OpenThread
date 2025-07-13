@@ -4,15 +4,15 @@ import asyncio
 from aiocoap import *
 
 # put your board's IP address here
-board_IP = "192.168.8.92"
+board_IP = "[2806:261:1483:8A94:C295:DAFF:FE01:839B]"
 
 # un comment the type of test you want to execute
-METHOD = "GET"
+#METHOD = "GET"
 #METHOD = "PUT"
 #METHOD = "DELETE"
 
-URI = "sensor"
-PAYLOAD = b"1"
+URI = "nombre"
+PAYLOAD = b"kenneth"
 
 logging.basicConfig(level=logging.INFO)
 
@@ -42,17 +42,17 @@ async def delete(ip, uri):
     print('Result: %s\n%r'%(response.code, response.payload))
 
 if __name__ == "__main__":
-  asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+  # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-  if(METHOD == "GET"):
+  #if(METHOD == "GET"):
     print("*** GET ***")
     asyncio.run(get(board_IP, URI))
-  if(METHOD == "PUT"):
+  #if(METHOD == "PUT"):
     print("*** PUT ***")
     asyncio.run(put(board_IP, URI, PAYLOAD))
     print("*** GET ***")
     asyncio.run(get(board_IP, URI))
-  if(METHOD == "DELETE"):
+  #if(METHOD == "DELETE"):
     print("*** DELETE ***")
     asyncio.run(delete(board_IP, URI))
     print("*** GET ***")
