@@ -46,35 +46,33 @@ void handle_led_request(void *aContext, otMessage *aMessage, const otMessageInfo
     otCoapMessageInitResponse(response, aMessage, OT_COAP_TYPE_ACKNOWLEDGMENT, OT_COAP_CODE_CHANGED);
     otCoapSendResponse(instance_g, response, aMessageInfo);
 }
-/*
-void handle_ledG_request(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
+
+char str_nombre[20] = "Sin nombre";
+
+void handle_nombre_request(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
 {
-    char payload[10];
-    int length = otMessageRead(aMessage, otMessageGetOffset(aMessage), payload, sizeof(payload) - 1);
-    payload[length] = '\0';
+    otMessage *response;
 
-    if (payload[0] == '1')
+    if (otCoapMessageGetCode(aMessage) == OT_COAP_CODE_GET)  
     {
-        // Turn LED on
-        otCliOutputFormat("Payload Recived: %s\r\n", payload);
-        otCliOutputFormat("LED On \r\n");
-        LED_ON(12);
+        response = otCoapNewMessage(instance_g, NULL);
+        otCliOutputFormat("GET\r\n");
 
-    }
-    else if (payload[0] == '0')
-    {
-        // Turn LED off
-        otCliOutputFormat("Payload Recived: %s\r\n", payload);
-        otCliOutputFormat("LED Off \r\n");
-        LED_OFF(12);
-    }
+        if (response != NULL)
+        {
+            otCoapMessageInitResponse(response, aMessage, OT_COAP_TYPE_ACKNOWLEDGMENT, OT_COAP_CODE_CONTENT);
+            
+            otCoapMessageSetPayloadMarker(response);
+                       
+            otCliOutputFormat("payload: %s\r\n", str_nombre);
 
-    //Send response
-    otMessage *response = otCoapNewMessage(instance_g, NULL);
-    otCoapMessageInitResponse(response, aMessage, OT_COAP_TYPE_ACKNOWLEDGMENT, OT_COAP_CODE_CHANGED);
-    otCoapSendResponse(instance_g, response, aMessageInfo);
+            otMessageAppend(response, str_nombre, strlen(str_nombre));
+
+            otCoapSendResponse(instance_g, response, aMessageInfo);
+        }
+    }
 }
-*/
+
 void handle_sensor_request(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
 {
     static double temp_value = 0;
@@ -116,7 +114,7 @@ void init_coap_server(otInstance *aInstance)
     
     static otCoapResource coapResource_led;
     static otCoapResource coapResource_sensor;
-//    static otCoapResource coapResource_ledG;
+    static otCoapResource coapResource_nombre;
     
     coapResource_led.mUriPath = "led";
     coapResource_led.mHandler = handle_led_request;
@@ -132,10 +130,10 @@ void init_coap_server(otInstance *aInstance)
 
     otCoapAddResource(aInstance, &coapResource_sensor);
 
-    /*coapResource_sensor.mUriPath = "ledG";
-    coapResource_sensor.mHandler = handle_ledG_request;
+    coapResource_sensor.mUriPath = "nombre";
+    coapResource_sensor.mHandler = handle_nombre_request;
     coapResource_sensor.mContext = NULL;
     coapResource_sensor.mNext = NULL;
 
-    otCoapAddResource(aInstance, &coapResource_ledG);*/
+    otCoapAddResource(aInstance, &coapResource_nombre);
 }
